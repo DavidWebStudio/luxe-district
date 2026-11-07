@@ -38,7 +38,21 @@
 
                 <div class="form-group">
                     <label for="login-password">Password</label>
-                    <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                    <div class="password-field">
+                        <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                        <button type="button" id="password-toggle" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="login-password">
+                            <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" hidden>
+                                <path d="M17.9 17.9A10.1 10.1 0 0 1 12 19c-6.4 0-10-7-10-7a18.4 18.4 0 0 1 4.1-5.1"></path>
+                                <path d="M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18.5 18.5 0 0 1-2.2 3.2"></path>
+                                <path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"></path>
+                                <path d="M2 2l20 20"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" id="login-button" class="primary-button">Sign In</button>
