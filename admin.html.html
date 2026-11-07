@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Keeps the admin page out of Google and other search engines -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>LUXE DISTRICT | Admin Dashboard</title>
+    <meta name="description" content="Manage products and inventory for LUXE DISTRICT.">
+
+    <link rel="stylesheet" href="css/admin.css">
+
+    <!-- Supabase library, pinned to one exact version (confirm it on npmjs.com/package/@supabase/supabase-js) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
+    <script src="js/admin.js" defer></script>
+</head>
+
+<body>
+
+<div class="admin-page">
+
+    <!-- ========== LOGIN ========== -->
+    <main id="login-section" class="login-section">
+        <div class="login-card">
+
+            <a href="index.html" class="admin-brand">LUXE <span>DISTRICT</span></a>
+
+            <p class="admin-label">STORE MANAGEMENT</p>
+            <h1>Welcome back.</h1>
+            <p class="login-description">Sign in to manage your products and collection.</p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email address</label>
+                    <input type="email" id="login-email" name="email" placeholder="admin@example.com" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-field">
+                        <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                        <button type="button" id="password-toggle" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="login-password">
+                            <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" hidden>
+                                <path d="M17.9 17.9A10.1 10.1 0 0 1 12 19c-6.4 0-10-7-10-7a18.4 18.4 0 0 1 4.1-5.1"></path>
+                                <path d="M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18.5 18.5 0 0 1-2.2 3.2"></path>
+                                <path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"></path>
+                                <path d="M2 2l20 20"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="login-button" class="primary-button">Sign In</button>
+
+                <p id="login-message" class="form-message" role="status" aria-live="polite" hidden></p>
+            </form>
+
+            <noscript><p class="form-message">Please turn on JavaScript to sign in.</p></noscript>
+
+            <a href="index.html" class="back-link">← Back to storefront</a>
+
+        </div>
+    </main>
+
+
+    <!-- ========== DASHBOARD ========== -->
+    <div id="dashboard-section" hidden>
+
+        <header class="dashboard-header">
+            <a href="index.html" class="admin-brand">LUXE <span>DISTRICT</span></a>
+
+            <div class="dashboard-header-actions">
+                <a href="index.html" class="secondary-button" target="_blank" rel="noopener noreferrer">View Store</a>
+                <button type="button" id="logout-button" class="logout-button">Log Out</button>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+
+            <div class="dashboard-heading">
+                <div>
+                    <p class="admin-label">STORE MANAGEMENT</p>
+                    <h1 id="dashboard-title" tabindex="-1">Dashboard</h1>
+                    <p class="dashboard-description">Manage your collection from one place.</p>
+                </div>
+
+                <div class="dashboard-status">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    Admin Panel
+                </div>
+            </div>
+
+            <div id="dashboard-message" class="dashboard-message" role="status" aria-live="polite" hidden></div>
+
+
+            <!-- ===== ADD / EDIT PRODUCT ===== -->
+            <section class="admin-panel product-editor" aria-labelledby="editor-heading">
+
+                <div class="panel-heading">
+                    <div>
+                        <p class="admin-label">INVENTORY</p>
+                        <h2 id="editor-heading">Add a new product</h2>
+                    </div>
+                    <span class="panel-number" aria-hidden="true">01</span>
+                </div>
+
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+                            <label for="product-name">Product name *</label>
+                            <input type="text" id="product-name" name="name" placeholder="e.g. The Signature Handbag" maxlength="120" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-category">Category *</label>
+                            <select id="product-category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="bags">Bags</option>
+                                <option value="shoes">Shoes</option>
+                                <option value="perfume">Fragrances</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-price">Selling price (₦) *</label>
+                            <input type="number" id="product-price" name="price" placeholder="35000" min="0" step="0.01" inputmode="decimal" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-old-price">Previous price (₦)</label>
+                            <input type="number" id="product-old-price" name="old_price" placeholder="45000" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-stock">Available stock *</label>
+                            <input type="number" id="product-stock" name="stock" value="1" min="0" step="1" inputmode="numeric" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-badge">Product badge</label>
+                            <select id="product-badge" name="badge">
+                                <option value="">No badge</option>
+                                <option value="NEW">NEW</option>
+                                <option value="SALE">SALE</option>
+                                <option value="BESTSELLER">BESTSELLER</option>
+                                <option value="LIMITED EDITION">LIMITED EDITION</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="product-image">Product image *</label>
+                            <input type="file" id="product-image" name="image" accept="image/jpeg,image/png,image/webp,image/avif" aria-describedby="image-help">
+
+                            <small class="field-help" id="image-help">
+                                Choose an image from your computer. Maximum file size: 5 MB.
+                                When editing, select a new image only if you want to replace the existing one.
+                            </small>
+
+                            <div id="image-preview-container" class="image-preview-container" hidden>
+                                <img id="image-preview" src="" alt="Product image preview">
+                                <button type="button" id="remove-preview-button" class="text-button" hidden>Clear selected image</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="product-description">Product description *</label>
+                            <textarea id="product-description" name="description" rows="5" maxlength="2000" placeholder="Describe the product..." required></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="product-active" checked>
+                                <span>Make this product visible in the store</span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="save-product-button" class="primary-button">Save Product</button>
+                        <button type="button" id="cancel-edit-button" class="secondary-button" hidden>Cancel Editing</button>
+                    </div>
+                </form>
+
+            </section>
+
+
+            <!-- ===== HOMEPAGE FEATURE CARDS ===== -->
+            <section class="admin-panel" aria-labelledby="homepage-cards-heading">
+
+                <div class="panel-heading">
+                    <div>
+                        <p class="admin-label">STOREFRONT CONTENT</p>
+                        <h2 id="homepage-cards-heading">Homepage Feature Cards</h2>
+                        <p class="dashboard-description">
+                            Update the images and text displayed in the "New to the District" section.
+                        </p>
+                    </div>
+                    <span class="panel-number" aria-hidden="true">02</span>
+                </div>
+
+                <form id="homepage-cards-form">
+
+                <!-- Card 1 -->
+                <div class="card-editor" role="group" aria-labelledby="card-1-title">
+
+                    <div class="card-editor-header">
+                        <h3 id="card-1-title">Card 1 — Everyday Edit</h3>
+                        <span class="unsaved-badge" id="card-1-unsaved" hidden>Unsaved changes</span>
+                    </div>
+
+                    <div class="card-editor-layout">
+
+                        <div class="form-grid card-editor-fields">
+
+                            <div class="form-group">
+                                <label for="card-1-eyebrow">Eyebrow text</label>
+                                <input type="text" id="card-1-eyebrow" maxlength="80" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-1-heading">Heading</label>
+                                <input type="text" id="card-1-heading" maxlength="120" required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="card-1-image-url">Image URL (optional)</label>
+                                <input type="url" id="card-1-image-url" placeholder="Paste an HTTPS image URL, or leave blank to upload">
+
+                                <small class="field-help">
+                                    Enter an image URL OR upload an image below. If both are provided,
+                                    the uploaded image will be used.
+                                </small>
+
+                                <label for="card-1-image-file">Upload image from your computer</label>
+                                <input type="file" id="card-1-image-file" accept="image/jpeg,image/png,image/webp,image/avif">
+
+                                <button type="button" id="card-1-remove-image" class="secondary-button" hidden>Remove Selected Image</button>
+
+                                <small class="field-help">Accepted formats: JPEG, PNG, WebP, AVIF. Maximum size: 5 MB.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-1-image-alt">Image description</label>
+                                <input type="text" id="card-1-image-alt" value="Woman in a modern everyday outfit" maxlength="200" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-1-link-url">Destination link</label>
+                                <input type="text" id="card-1-link-url" value="#shop" maxlength="500" placeholder="#shop" required>
+                            </div>
+
+                        </div>
+
+                        <!-- Live preview: only changes in this admin page until you click Save -->
+                        <aside class="card-live-preview" aria-label="Live preview of the first homepage card">
+                            <p class="admin-label">Live preview</p>
+
+                            <div class="live-card is-empty" id="card-1-live-frame">
+                                <img
+                                    id="card-1-image-preview"
+                                    class="homepage-image-preview"
+                                    alt="Preview of the first homepage feature image"
+                                    hidden
+                                >
+                                <p class="live-card-empty" id="card-1-live-empty">No image selected</p>
+
+                                <div class="live-card-caption">
+                                    <span id="card-1-live-eyebrow"></span>
+                                    <p class="live-card-heading" id="card-1-live-heading"></p>
+                                </div>
+                            </div>
+
+                            <dl class="live-card-meta">
+                                <dt>Image description</dt>
+                                <dd id="card-1-live-alt"></dd>
+                                <dt>Links to</dt>
+                                <dd id="card-1-live-link"></dd>
+                            </dl>
+
+                            <p class="field-help">
+                                Preview only. Your storefront changes after you click
+                                &ldquo;Save Homepage Cards&rdquo;.
+                            </p>
+                        </aside>
+
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-editor" role="group" aria-labelledby="card-2-title">
+
+                    <div class="card-editor-header">
+                        <h3 id="card-2-title">Card 2 — Accessory Edit</h3>
+                        <span class="unsaved-badge" id="card-2-unsaved" hidden>Unsaved changes</span>
+                    </div>
+
+                    <div class="card-editor-layout">
+
+                        <div class="form-grid card-editor-fields">
+
+                            <div class="form-group">
+                                <label for="card-2-eyebrow">Eyebrow text</label>
+                                <input type="text" id="card-2-eyebrow" maxlength="80" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-2-heading">Heading</label>
+                                <input type="text" id="card-2-heading" maxlength="120" required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="card-2-image-url">Image URL (optional)</label>
+                                <input type="url" id="card-2-image-url" placeholder="Paste an HTTPS image URL, or leave blank to upload">
+
+                                <small class="field-help">
+                                    Enter an image URL OR upload an image below. If both are provided,
+                                    the uploaded image will be used.
+                                </small>
+
+                                <label for="card-2-image-file">Upload image from your computer</label>
+                                <input type="file" id="card-2-image-file" accept="image/jpeg,image/png,image/webp,image/avif">
+
+                                <button type="button" id="card-2-remove-image" class="secondary-button" hidden>Remove Selected Image</button>
+
+                                <small class="field-help">Accepted formats: JPEG, PNG, WebP, AVIF. Maximum size: 5 MB.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-2-image-alt">Image description</label>
+                                <input type="text" id="card-2-image-alt" value="Handbag styled with accessories" maxlength="200" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-2-link-url">Destination link</label>
+                                <input type="text" id="card-2-link-url" value="#shop" maxlength="500" placeholder="#shop" required>
+                            </div>
+
+                        </div>
+
+                        <!-- Live preview: only changes in this admin page until you click Save -->
+                        <aside class="card-live-preview" aria-label="Live preview of the second homepage card">
+                            <p class="admin-label">Live preview</p>
+
+                            <div class="live-card is-empty" id="card-2-live-frame">
+                                <img
+                                    id="card-2-image-preview"
+                                    class="homepage-image-preview"
+                                    alt="Preview of the second homepage feature image"
+                                    hidden
+                                >
+                                <p class="live-card-empty" id="card-2-live-empty">No image selected</p>
+
+                                <div class="live-card-caption">
+                                    <span id="card-2-live-eyebrow"></span>
+                                    <p class="live-card-heading" id="card-2-live-heading"></p>
+                                </div>
+                            </div>
+
+                            <dl class="live-card-meta">
+                                <dt>Image description</dt>
+                                <dd id="card-2-live-alt"></dd>
+                                <dt>Links to</dt>
+                                <dd id="card-2-live-link"></dd>
+                            </dl>
+
+                            <p class="field-help">
+                                Preview only. Your storefront changes after you click
+                                &ldquo;Save Homepage Cards&rdquo;.
+                            </p>
+                        </aside>
+
+                    </div>
+                </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="save-homepage-cards-button" class="primary-button">Save Homepage Cards</button>
+                    </div>
+
+                    <p id="homepage-cards-message" class="form-message" role="status" aria-live="polite" hidden></p>
+                </form>
+
+            </section>
+
+
+            <!-- ===== PRODUCT COLLECTION ===== -->
+            <section class="admin-panel inventory-panel" aria-labelledby="inventory-heading">
+
+                <div class="panel-heading">
+                    <div>
+                        <p class="admin-label">YOUR COLLECTION</p>
+                        <h2 id="inventory-heading">Manage products</h2>
+                    </div>
+                    <span id="product-count" class="product-count" role="status">0 products</span>
+                </div>
+
+                <div class="inventory-toolbar">
+                    <div class="form-group search-group">
+                        <label for="inventory-search">Search products</label>
+                        <input type="search" id="inventory-search" placeholder="Search by product name...">
+                    </div>
+
+                    <div class="form-group filter-group">
+                        <label for="inventory-category-filter">Filter category</label>
+                        <select id="inventory-category-filter">
+                            <option value="all">All categories</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="bags">Bags</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="perfume">Fragrances</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="inventory-loading" class="inventory-state">Loading your collection...</div>
+                <div id="inventory-empty" class="inventory-state" hidden>No products found.</div>
+                <div id="inventory-list" class="inventory-list"></div>
+
+            </section>
+
+            <footer class="dashboard-footer">
+                <p>&copy; <span id="admin-year"></span> LUXE DISTRICT</p>
+                <p>Premium style. Effortless management.</p>
+            </footer>
+
+        </main>
+
+    </div>
+
+</div>
+
+</body>
+</html>
