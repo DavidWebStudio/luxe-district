@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loginEmail: $("login-email"),
         loginPassword: $("login-password"),
         loginButton: $("login-button"),
+        passwordToggle: $("password-toggle"),
         loginMessage: $("login-message"),
         logoutButton: $("logout-button"),
         dashboardMessage: $("dashboard-message"),
@@ -278,11 +279,13 @@ document.addEventListener("DOMContentLoaded", () => {
        ========================================================== */
 
     function showLogin() {
+        setPasswordVisible(false);
         ui.loginSection.hidden = false;
         ui.dashboardSection.hidden = true;
     }
 
     function showDashboard() {
+        setPasswordVisible(false);
         ui.loginSection.hidden = true;
         ui.dashboardSection.hidden = false;
         ui.dashboardTitle?.focus();
@@ -1394,6 +1397,28 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ==========================================================
        15. START
        ========================================================== */
+
+    /* ==========================================================
+       14b. PASSWORD SHOW / HIDE
+       Only switches the input type. The value, the form and the
+       sign-in request are never touched. The password is hidden
+       again whenever the login screen or dashboard is shown.
+       ========================================================== */
+
+    function setPasswordVisible(visible) {
+        if (!ui.passwordToggle || !ui.loginPassword) return;
+
+        ui.loginPassword.type = visible ? "text" : "password";
+        ui.passwordToggle.setAttribute("aria-pressed", String(visible));
+        ui.passwordToggle.setAttribute("aria-label", visible ? "Hide password" : "Show password");
+        // SVG elements have no .hidden property, so toggle the attribute itself
+        ui.passwordToggle.querySelector(".icon-eye").toggleAttribute("hidden", visible);
+        ui.passwordToggle.querySelector(".icon-eye-off").toggleAttribute("hidden", !visible);
+    }
+
+    ui.passwordToggle?.addEventListener("click", () => {
+        setPasswordVisible(ui.loginPassword.type === "password");
+    });
 
     initializeApp();
 });
